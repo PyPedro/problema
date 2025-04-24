@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problemas Cadastrados</title>
+    <!-- Bootstrap 5 via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+      <h1 class="mb-4">Lista de Problemas</h1>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">Voltar</a>
+      
+      <ul class="list-group mb-4">
+        {% for problem in problems %}
+          <li class="list-group-item">
+            <h5>{{ problem.title }}</h5>
+            <p>{{ problem.description }}</p>
+            {% if user_role in ['admin','validador'] %}
+              <a href="{{ url_for('delete_problem', problem_id=problem.id) }}" class="btn btn-danger btn-sm">[Excluir]</a>
+              <form action="{{ url_for('edit_problem', problem_id=problem.id) }}" method="post" class="d-inline">
+                <input type="text" name="title" value="{{ problem.title }}">
+                <input type="text" name="description" value="{{ problem.description }}">
+                <button type="submit" class="btn btn-warning btn-sm">Editar</button>
+              </form>
+            {% endif %}
+            <h6 class="mt-2">Soluções:</h6>
+            <ul class="list-group mb-2">
+              {% for solution in problem.solutions %}
+                <li class="list-group-item">
+                  {{ solution.description }}
+                  {% if user_role in ['admin','validador'] %}
+                    <a href="{{ url_for('delete_solution', solution_id=solution.id) }}" class="btn btn-danger btn-sm">[Excluir]</a>
+                    <form action="{{ url_for('edit_solution', solution_id=solution.id) }}" method="post" class="d-inline">
+                      <input type="text" name="description" value="{{ solution.description }}">
+                      <button type="submit" class="btn btn-warning btn-sm">Editar</button>
+                    </form>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+            {% if user_role in ['admin','validador'] %}
+            <form action="{{ url_for('add_solution', problem_id=problem.id) }}" method="post" class="d-flex">
+              <input type="text" name="description" placeholder="Adicionar solução" class="form-control me-2">
+              <button type="submit" class="btn btn-success btn-sm">Adicionar</button>
+            </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <h2>Cadastrar Novo Problema</h2>
+      <form action="{{ url_for('create_problem') }}" method="post" class="mb-4">
+          <input type="text" name="title" placeholder="Título" class="form-control mb-2" required>
+          <input type="text" name="description" placeholder="Descrição" class="form-control mb-2" required>
+          <button type="submit" class="btn btn-primary">Cadastrar</button>
+      </form>
+    </div>
+    <!-- Bootstrap JS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
